@@ -1,13 +1,33 @@
+/*
+  Скетч к проекту "Часы из часов"
+  Страница проекта (схемы, описания): https://alexgyver.ru/disp-clock/
+  Исходники на GitHub: https://github.com/AlexGyver/SegmentMonitor
+  Нравится, как написан и закомментирован код? Поддержи автора! https://alexgyver.ru/support_alex/
+  Автор: AlexGyver Technologies, 2022
+  http://AlexGyver.ru/
+*/
+
+// ВНИМАНИЕ! Это "playground", а не полноценный проект. Реализован
+// вывод как на графический дисплей, подключен GyverGFX, можно рисовать
+// и выводить битмапы. Также сделан вывод часов (шрифт в комплекте)
+// САМИ ЧАСЫ Я НЕ ДЕЛАЛ, ЭТО ПРОСТО ДЕМОНСТРАЦИЯ!
+// если вам нужно - пишите, я помогу
+
 #include "MAX7219.h"
-#include "dig3.h"
+#include "dig3.h" // шрифт для часов
 
-#define DW 6
-#define DH 3
+#define DW 6  // кол-во МИКРОСХЕМ по горизонтали
+#define DH 3  // кол-во МИКРОСХЕМ по вертикали
 
-#define DWW (DW*4)
-#define DHH (DH*2)
+#define DWW (DW*4)  // расчёт кол-ва индикаторов гориз.
+#define DHH (DH*2)  // расчёт кол-ва индикаторов верт.
 
-// wrench 8pix/byte, BW
+// указать пин CS!
+MaxDisp<9, DW, DH> disp;
+
+// битмап логотипа
+// сделан в ImageProcessor https://github.com/AlexGyver/imageProcessor
+// с настройками 8pix/byte, BW
 const uint8_t wrench_43x36[] PROGMEM = {
   0x00, 0x1F, 0xF8, 0x00, 0x3F, 0x00,
   0x00, 0x7F, 0xE0, 0x00, 0x7F, 0x80,
@@ -47,72 +67,14 @@ const uint8_t wrench_43x36[] PROGMEM = {
   0x00, 0xF8, 0x00, 0x00, 0x70, 0x00,
 };
 
-MaxDisp<9, DW, DH> disp;
-
 void setup() {
   randomSeed(analogRead(0));
   disp.begin();
   disp.setBright(15);
-  
-  /*while (1) {
-    disp.begin();
-  disp.setBright(15);
-  disp.fill(0xff);
-  disp.update();
-  delay(500);
-  }*/
-
-  /*
-    // отскоки
-    int x = random(0, DWW * 10);
-    int y = random(0, DHH * 10);
-    int vx = 3;
-    int vy = 1;
-    while (1) {
-      x += vx;
-      y += vy;
-      if (x < 0) x = 0, vx = -vx;
-      if (x / 10 >= DWW) x = (DWW - 1) * 10, vx = -vx;
-      if (y < 0) y = 0, vy = -vy;
-      if (y / 10 >= DHH) y = (DHH - 1) * 10, vy = -vy;
-      disp.clearBuffer();
-      disp.setByte(x / 10, y / 10, 0x7f);
-      disp.update();
-      delay(10);
-    }
-  */
-  /*
-    // заполнение всех
-    for (int i = 0; i < DWW*DHH; i++) {
-    disp.buf[i] = 0x7f;
-    disp.update();
-    delay(50);
-    }
-  */
-  /*
-    // проверка всех
-    while (1) {
-      byte b = 1;
-      for (int i = 0; i < 7; i++) {
-        disp.fill(b);
-        b <<= 1;
-        delay(150);
-      }
-    }
-  */
-  /*
-    // 1234
-    for (int i = 0; i < 15; i++) disp.buf[i] = 0xf;
-    disp.buf[0] = 1;
-    disp.buf[7] = 3;
-    disp.buf[8] = 2;
-    disp.buf[15] = 4;
-    disp.update();
-  */
-
 }
 
 void loop() {
+  // выбери эффект, который будет воспроизводиться
   //bigBall();
   //net();
   party();
