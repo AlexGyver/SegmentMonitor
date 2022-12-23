@@ -1,5 +1,12 @@
+#pragma once
+
+// библиотека для управления 7-сегментным графическим дисплеем
+// берёт движок графики из GyverGFX
+
 #include <SPI.h>
 #include "GyverGFX.h"
+
+// тут можно настроить частоту SPI
 SPISettings MAX_SPI_SETT(1000000, MSBFIRST, SPI_MODE0);
 
 template <byte CS, byte WW, byte HH>
