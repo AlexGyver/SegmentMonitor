@@ -9,6 +9,17 @@
 // тут можно настроить частоту SPI
 SPISettings MAX_SPI_SETT(1000000, MSBFIRST, SPI_MODE0);
 
+// fast div 6 + % 6
+struct div6_t {
+  void div(uint16_t x) {
+    // 342 == (1 << 11) / 6 + 1
+    quot = (x * 342) >> 11;
+    rem = x - quot * 6;
+  }
+  uint8_t quot, rem;
+};
+div6_t _div6;
+
 template <byte CS, byte WW, byte HH>
 struct MaxDisp : public GyverGFX {
   MaxDisp() : GyverGFX(WW * 4 * 4, HH * 2 * 6) {}
@@ -40,11 +51,12 @@ struct MaxDisp : public GyverGFX {
 
   void dot(int x, int y, uint8_t fill = 1) {
     // выбираем индикатор
-    byte& b = getByte(x >> 2, y / 6);   // x/4
+    _div6.div(y);   // y/6 + y%6
+    byte& b = getByte(x >> 2, _div6.quot);   // x/4, y/6
     
     // x и y внутри индикатора (суб-матрица 6х4)
     x = x & 3;  // x%4
-    y = y % 6;
+    y = _div6.rem;  // y%6
     
     // сумма со сдвигом, уникальный адрес каждого пикселя
     byte z = x | (y << 2);
