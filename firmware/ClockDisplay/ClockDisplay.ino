@@ -7,6 +7,8 @@
   http://AlexGyver.ru/
 */
 
+// проведена оптимизация бегущей строки и вообще расчётов
+
 // ВНИМАНИЕ! Это "playground", а не полноценный проект. Реализован
 // вывод как на графический дисплей, подключен GyverGFX, можно рисовать
 // и выводить битмапы. Также сделан вывод часов (шрифт в комплекте)
@@ -70,16 +72,17 @@ const uint8_t wrench_43x36[] PROGMEM = {
 void setup() {
   randomSeed(analogRead(0));
   disp.begin();
-  disp.setBright(15);
+  disp.setBright(10);
+  disp.textDisplayMode(GFX_ADD);
 }
 
 void loop() {
   // выбери эффект, который будет воспроизводиться
   //bigBall();
   //net();
-  party();
+  //party();
   //clock_e();
-  //running();
+  running();
 }
 
 void running() {

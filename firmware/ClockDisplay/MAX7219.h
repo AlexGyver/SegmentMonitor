@@ -18,7 +18,7 @@ struct MaxDisp : public GyverGFX {
     pinMode(CS, OUTPUT);
 
     sendCMD(0xF, 0x00);  // отключить тест
-    sendCMD(0x9, 0x0);  // декодирование
+    sendCMD(0x9, 0x00);  // откл декодирование
     sendCMD(0xA, 0x00);  // яркость мин
     sendCMD(0xB, 0x07);  // отображаем всё
     sendCMD(0xC, 0x01);  // включить
@@ -40,10 +40,10 @@ struct MaxDisp : public GyverGFX {
 
   void dot(int x, int y, uint8_t fill = 1) {
     // выбираем индикатор
-    byte& b = getByte(x / 4, y / 6);
+    byte& b = getByte(x >> 2, y / 6);   // x/4
     
     // x и y внутри индикатора (суб-матрица 6х4)
-    x = x % 4;
+    x = x & 3;  // x%4
     y = y % 6;
     
     // сумма со сдвигом, уникальный адрес каждого пикселя
@@ -56,6 +56,7 @@ struct MaxDisp : public GyverGFX {
       case 0xE:  bitWrite(b, 4, fill); break;
       case 0x6:  bitWrite(b, 5, fill); break;
       case 0x1:  bitWrite(b, 6, fill); break;
+      //case 0x13: bitWrite(b, 7, fill); break;
     }
   }
 
@@ -63,13 +64,14 @@ struct MaxDisp : public GyverGFX {
     getByte(x, y) = b;
   }
   byte& getByte(int x, int y) {
-    return buf[(y >> 1) * (WW * 8) + (x >> 2) * 8 + (x % 4) + (y % 2) * 4];
+    //return buf[(y >> 1) * (WW * 8) + (x >> 2) * 8 + (x % 4) + (y % 2) * 4];
+    return buf[(y >> 1) * (WW << 3) + ((x >> 2) << 3) + (x & 3) + ((y & 1) << 2)];
   }
 
   void update() {
     for (int i = 0; i < 8; i++) {
       beginData();
-      for (int j = 0; j < WW * HH; j++) sendData(i + 1, buf[(WW * HH - 1 - j) * 8 + i]);
+      for (int j = 0; j < WW * HH; j++) sendData(i + 1, buf[((WW * HH - 1 - j) << 3) + i]);
       endData();
     }
   }
