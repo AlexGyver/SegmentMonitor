@@ -7,7 +7,7 @@
 #include "GyverGFX.h"
 
 // тут можно настроить частоту SPI
-SPISettings MAX_SPI_SETT(1000000, MSBFIRST, SPI_MODE0);
+SPISettings MAX_SPI_SETT(500000, MSBFIRST, SPI_MODE0);
 
 template <byte CS, byte WW, byte HH>
 struct MaxDisp : public GyverGFX {
@@ -83,11 +83,12 @@ struct MaxDisp : public GyverGFX {
   }
 
   void fill(byte b = 0) {
-    for (int i = 0; i < 8; i++) {
+    /*for (int i = 0; i < 8; i++) {
       beginData();
       for (int j = 0; j < WW * HH; j++) sendData(i + 1, b);
       endData();
-    }
+    }*/
+    memset(buf, b, WW * HH * 8);
   }
 
   void sendByte(uint8_t address, uint8_t value) {

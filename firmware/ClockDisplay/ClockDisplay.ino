@@ -83,7 +83,30 @@ void loop() {
   //net();
   //party();
   //clock_e();
-  running();
+  //running();
+  //segTest1();
+  segTest2();
+}
+
+void segTest2() {
+  uint8_t b = 1;
+  for (int i = 0; i < 8; i++) {
+    disp.fill(b);
+    disp.update();
+    delay(300);
+    b <<= 1;
+  }
+}
+
+void segTest1() {
+  for (int y = 0; y < DHH; y++) {
+    for (int x = 0; x < DWW; x++) {
+      disp.clear();
+      disp.setByte(x, y, 0xff);
+      disp.update();
+      delay(100);
+    }
+  }
 }
 
 void running() {
@@ -102,7 +125,7 @@ void running() {
 
 
 void drawDigit(byte dig, int x) {
-  disp.drawBitmap(x, 0, (const uint8_t*)pgm_read_word(&(digs[dig])), d_width, 36);
+  disp.drawBitmap(x, 0, (const uint8_t*)pgm_read_word(&(digs[dig])), d_width, 36, 0);
 }
 void drawClock(byte h, byte m, bool dots) {
   disp.clear();
