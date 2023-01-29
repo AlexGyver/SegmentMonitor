@@ -17,16 +17,17 @@
 // если вам нужно - пишите, я помогу
 
 #include "MAX7219.h"
-#include "dig3.h" // шрифт для часов
+#include "dig3.h"   // шрифт для часов. Можно переключить между dig1, dig2, dig3
 
-#define DW 6  // кол-во МИКРОСХЕМ по горизонтали
-#define DH 3  // кол-во МИКРОСХЕМ по вертикали
+#define MAX_CS D8  // пин CS
+#define DW 6      // кол-во МИКРОСХЕМ по горизонтали
+#define DH 3      // кол-во МИКРОСХЕМ по вертикали
 
 #define DWW (DW*4)  // расчёт кол-ва индикаторов гориз.
 #define DHH (DH*2)  // расчёт кол-ва индикаторов верт.
 
 // указать пин CS!
-MaxDisp<9, DW, DH> disp;
+MaxDisp<MAX_CS, DW, DH> disp;
 
 // битмап логотипа
 // сделан в ImageProcessor https://github.com/AlexGyver/imageProcessor
@@ -82,10 +83,10 @@ void loop() {
   //bigBall();
   //net();
   //party();
-  //clock_e();
+  clock_e();
   //running();
   //segTest1();
-  segTest2();
+  //segTest2();
 }
 
 void segTest2() {
@@ -125,8 +126,13 @@ void running() {
 
 
 void drawDigit(byte dig, int x) {
+#ifdef __AVR__
   disp.drawBitmap(x, 0, (const uint8_t*)pgm_read_word(&(digs[dig])), d_width, 36, 0);
+#else
+  disp.drawBitmap(x, 0, (const uint8_t*)pgm_read_dword(&(digs[dig])), d_width, 36, 0);
+#endif
 }
+
 void drawClock(byte h, byte m, bool dots) {
   disp.clear();
   if (h > 9) drawDigit(h / 10, 0);
@@ -144,20 +150,12 @@ void clock_e() {
   // часы
   static int h = 22, m = 30;
   static volatile bool d;
-  while (1) {
-    drawClock(h, m, d);
-    d = !d;
-    if (++m >= 60) m = 0, h++;
-    if (h >= 24) h = 0;
-    delay(500);
-  }
 
-  for (int i = 0; i < 10; i++) {
-    disp.clear();
-    drawDigit(i, 0);
-    disp.update();
-    delay(500);
-  }
+  drawClock(h, m, d);
+  d = !d;
+  if (++m >= 60) m = 0, h++;
+  if (h >= 24) h = 0;
+  delay(500);
 }
 
 void party() {
